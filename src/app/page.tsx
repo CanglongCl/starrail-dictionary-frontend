@@ -1,95 +1,145 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+import { useState } from "react";
+import {
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  Paper,
+  TextField,
+  Card,
+  Container,
+  Box,
+  CardContent,
+  Button,
+  CardActions,
+  Typography,
+  Stack,
+} from "@mui/material";
+import * as React from "react";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import SearchIcon from "@mui/icons-material/Search";
+import GitHubIcon from "@mui/icons-material/GitHub";
+
+type SearchResultItem = {
+  vocabulary_id: number;
+  target: string;
+  target_lang: string;
+  lan_dict: { [lang: string]: string };
+};
 
 export default function Home() {
+  const [searchWord, setSearchWord] = useState("");
+  const [searchResultItems, setSearchResultItems] =
+    useState<Array<SearchResultItem> | null>(null);
+  const [error, setError] = useState(null);
+
+  function handelSearch() {
+    console.log(searchWord);
+    fetch(
+      `http://127.0.0.1:3001/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`
+    )
+      .then((response) => response.json())
+      .then((data: Array<SearchResultItem>) => {
+        console.log(data);
+        setSearchResultItems(data);
+      })
+      .catch((error) => setError(error));
+  }
+
+  function ItemCards() {
+    if (searchResultItems == null) {
+      return null;
+    } else if (searchResultItems.length != 0) {
+      return (
+        <Stack direction="column" spacing={2}>
+          {searchResultItems.map((item) => (
+            <DictionaryItemCard item={item} key={item.vocabulary_id} />
+          ))}
+        </Stack>
+      );
+    } else if (searchResultItems.length == 0) {
+      return <p>No word found. </p>;
+    } else if (error != null) {
+      return <p>error</p>;
+    } else {
+      return <p>Please search first. </p>;
+    }
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handelSearch()
+    }
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
+    <Container maxWidth="md">
+      <Stack spacing={3}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={3}
+          justifyContent="space-between"
+        >
+          <Typography variant="h3" component="div">
+            {"Honkai: Star Rail Dictionary"}
+          </Typography>
+          <a href="https://github.com/CanglongCl/starrail-dictionary">
+            <GitHubIcon fontSize="large" />
           </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+        </Stack>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={3}
+          justifyContent="space-between"
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+          <TextField
+            fullWidth
+            onChange={(event) => setSearchWord(event.target.value)}
+            value={searchWord}
+            onKeyDown={handleKeyDown}
+          />
+          <IconButton sx={{ p: "5px" }} onClick={handelSearch}>
+            <SearchIcon />
+          </IconButton>
+        </Stack>
+        <ItemCards />
+      </Stack>
+    </Container>
+  );
+}
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+function DictionaryItemCard({ item }: { item: SearchResultItem }) {
+  return (
+    <Card>
+      <CardContent>
+        <Typography
+          sx={{
+            fontSize: 14,
+            display: "flex",
+            alignItems: "center",
+          }}
+          gutterBottom
         >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+          <span>{item.target_lang}</span>
+          <span color="grey">{item.vocabulary_id}</span>
+        </Typography>
+        <Typography variant="h5" component="div">
+          {item.target}
+        </Typography>
+        {Object.entries(item.lan_dict).map(([lang, dict]) => (
+          <Typography
+            key={lang}
+            variant="body2"
+            color="text.primary"
+            sx={{ textAlign: "left" }}
+          >
+            {lang}: {dict}
+          </Typography>
+        ))}
+      </CardContent>
+    </Card>
+  );
 }
