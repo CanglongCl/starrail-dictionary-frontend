@@ -37,7 +37,7 @@ export default function Home() {
   function handelSearch() {
     console.log(searchWord);
     fetch(
-      `http://127.0.0.1:3001/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`
+      `/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`
     )
       .then((response) => response.json())
       .then((data: Array<SearchResultItem>) => {
