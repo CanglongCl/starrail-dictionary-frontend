@@ -36,9 +36,7 @@ export default function Home() {
 
   function handelSearch() {
     console.log(searchWord);
-    fetch(
-      `/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`
-    )
+    fetch(`/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`)
       .then((response) => response.json())
       .then((data: Array<SearchResultItem>) => {
         console.log(data);
@@ -68,10 +66,10 @@ export default function Home() {
   }
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      handelSearch()
+    if (event.key === "Enter") {
+      handelSearch();
     }
-  }
+  };
 
   return (
     <Container maxWidth="md">
