@@ -3,7 +3,7 @@ import error from "next/error";
 import { use } from "react";
 
 async function handelSearch(searchWord: string): Promise<Array<SearchResultItem>> {
-  const data = await fetch(`http://hsrdict.pizzastudio.org/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`);
+  const data = await fetch(`/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`);
   const obj = await data.json();
   return obj;
 }
