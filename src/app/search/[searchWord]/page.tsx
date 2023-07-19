@@ -1,19 +1,19 @@
-import ItemCards from "@/Components/DictionaryItemCard";
+export const runtime = 'edge';
 
-export default function Page({ params }: { params: { searchWord: string } }) {
+import ItemCards from "@/Components/DictionaryItemCard";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+
+export default async function Page({
+  params,
+}: {
+  params: { searchWord: string };
+}) {
   const { searchWord } = params;
 
-  const SearchCard = () => {
-    if (typeof searchWord === "string") {
-      return <ItemCards searchWord={searchWord} />;
-    } else {
-      return null;
-    }
-  };
-
   return (
-    <>
-      <SearchCard />
-    </>
+    <Suspense fallback={<p>Loading...</p>}>
+      <ItemCards searchWord={searchWord} />
+    </Suspense>
   );
 }

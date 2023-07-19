@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Search word for Honkai: Star Rail in all languages. ",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;

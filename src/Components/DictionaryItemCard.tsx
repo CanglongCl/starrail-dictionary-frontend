@@ -1,9 +1,14 @@
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import error from "next/error";
-import { use } from "react";
+import { notFound } from "next/navigation";
+import { Suspense, use } from "react";
 
-async function handelSearch(searchWord: string): Promise<Array<SearchResultItem>> {
-  const data = await fetch(`/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`);
+async function handelSearch(
+  searchWord: string
+): Promise<Array<SearchResultItem>> {
+  const data = await fetch(
+    `http://hsrdict.pizzastudio.org/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`
+  );
   const obj = await data.json();
   return obj;
 }
@@ -15,8 +20,12 @@ type SearchResultItem = {
   lan_dict: { [lang: string]: string };
 };
 
-export default function ItemCards({searchWord}: {searchWord: string}) {
-  const searchResultItems = use(handelSearch(searchWord));
+export default async function ItemCards({
+  searchWord,
+}: {
+  searchWord: string;
+}) {
+  const searchResultItems = await handelSearch(searchWord);
 
   if (searchResultItems.length != 0) {
     return (
@@ -27,7 +36,7 @@ export default function ItemCards({searchWord}: {searchWord: string}) {
       </Stack>
     );
   } else {
-    return <p>No word found. </p>;
+    notFound();
   }
 }
 
