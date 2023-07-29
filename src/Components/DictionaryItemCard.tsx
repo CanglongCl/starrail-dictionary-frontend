@@ -1,17 +1,22 @@
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import error from "next/error";
 import { notFound } from "next/navigation";
-import { Suspense, use } from "react";
+import { Suspense } from "react";
 
-async function handelSearch(
-  searchWord: string
-): Promise<Array<SearchResultItem>> {
+async function handelSearch(searchWord: string): Promise<SearchResult> {
   const data = await fetch(
-    `http://api.hsrdict.pizzastudio.org/api/search?search_word=${searchWord}&batch_size=${10}&page=${0}`
+    `http://hsrdict-api.pizzastudio.org/v1/translations/${searchWord}?page=${1}&page_size=${10}`
   );
   const obj = await data.json();
   return obj;
 }
+
+type SearchResult = {
+  total: number;
+  page: number;
+  page_size: number;
+  translations: Array<SearchResultItem>;
+};
 
 type SearchResultItem = {
   vocabulary_id: number;
@@ -25,12 +30,14 @@ export default async function ItemCards({
 }: {
   searchWord: string;
 }) {
-  const searchResultItems = await handelSearch(searchWord);
+  const { total, page, page_size, translations } = await handelSearch(
+    searchWord
+  );
 
-  if (searchResultItems.length != 0) {
+  if (translations.length != 0) {
     return (
       <Stack direction="column" spacing={2}>
-        {searchResultItems.map((item) => (
+        {translations.map((item) => (
           <DictionaryItemCard item={item} key={item.vocabulary_id} />
         ))}
       </Stack>
