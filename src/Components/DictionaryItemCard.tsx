@@ -5,7 +5,7 @@ import { Suspense } from "react";
 
 async function handelSearch(searchWord: string): Promise<SearchResult> {
   const data = await fetch(
-    `http://hsrdict-api.pizzastudio.org/v1/translations/${searchWord}?page=${1}&page_size=${10}`
+    `https://hsrdict-api.pizzastudio.org/v1/translations/${searchWord}?page=${1}&page_size=${10}`
   );
   const obj = await data.json();
   return obj;
