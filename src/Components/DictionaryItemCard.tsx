@@ -8,14 +8,13 @@ async function handelSearch(searchWord: string): Promise<SearchResult> {
     `https://hsrdict-api.pizzastudio.org/v1/translations/${searchWord}?page=${1}&page_size=${10}`
   );
   const obj = await data.json();
+    console.log(obj);
   return obj;
 }
 
 type SearchResult = {
-  total: number;
-  page: number;
-  page_size: number;
-  translations: Array<SearchResultItem>;
+  total_page: number;
+  results: Array<SearchResultItem>;
 };
 
 type SearchResultItem = {
@@ -30,14 +29,15 @@ export default async function ItemCards({
 }: {
   searchWord: string;
 }) {
-  const { total, page, page_size, translations } = await handelSearch(
+  const { total_page, results } = await handelSearch(
     searchWord
   );
+  console.log(total_page, results);
 
-  if (translations.length != 0) {
+  if (results.length != 0) {
     return (
       <Stack direction="column" spacing={2}>
-        {translations.map((item) => (
+        {results.map((item) => (
           <DictionaryItemCard item={item} key={item.vocabulary_id} />
         ))}
       </Stack>
